@@ -1,0 +1,39 @@
+{
+  "name": "agile-sql",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint lib/**.js",
+    "lint:fix": "eslint --fix lib/**.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agile-iot/agile-sql.git"
+  },
+  "author": "",
+  "license": "EPL-1.0",
+  "bugs": {
+    "url": "https://github.com/agile-iot/agile-sql/issues"
+  },
+  "homepage": "https://github.com/agile-iot/agile-sql#readme",
+  "dependencies": {
+    "agile-sdk": "^1.2.6",
+    "axios": "^0.17.1",
+    "body-parser": "^1.18.2",
+    "eslint": "^4.13.1",
+    "express": "^4.16.2",
+    "http-errors": "^1.6.2",
+    "mysql": "^2.15.0",
+    "parse-bearer-token": "0.0.1",
+    "promise-sequential": "^1.1.1"
+  },
+  "devDependencies": {
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
