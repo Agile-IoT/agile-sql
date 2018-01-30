@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+
+  sql-db:
+    image: mysql
+    container_name: sql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306/tcp
+
+  sql-parser:
+    image: sqlparser
+    container_name: sql-parser
+    restart: always
+    depends_on:
+    - sql-db
+    ports:
+      - 8080:8080/tcp
+
+  agile-sql:
+   image: agile-sql
+   container_name: agile-sql
+   restart: always
+   depends_on:
+    - sql-parser
+    - sql-db
+   ports:
+    - 3005:3005/tcp
+   volumes:
+    - /home/dp/Documents/temp/conf:/etc/agile-sql/    
