@@ -1,6 +1,5 @@
 var mysql = require('mysql')
-var createError = require('http-errors');
-
+var createError = require('http-errors')
 
 /**
  * Creates a new Mysql connection.
@@ -31,7 +30,6 @@ DB.prototype.init = function () {
   })
 }
 
-
 /**
 * @summary Execute query on the backend. This function does not check policies, just executes SQL
 * @name execQuery
@@ -55,7 +53,7 @@ DB.prototype.execQuery = function (query) {
   return new Promise(function (resolve, reject) {
     that.connection.query(query, function (error, results, fields) {
       if (error) {
-        reject(createError(500,error))
+        reject(createError(500, error))
       } else {
         resolve({ results})
       }
@@ -77,7 +75,7 @@ DB.prototype.getAllTables = function () {
   return new Promise(function (resolve, reject) {
     that.connection.query('show tables', function (error, results, fields) {
       if (error) {
-        reject(createError(500,error))
+        reject(createError(500, error))
       } else {
         var res = results.map((row) => {
           return row.Tables_in_mysql

@@ -1,7 +1,7 @@
-const sequential = require('promise-sequential');
-const axios = require('axios');
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-var createError = require('http-errors');
+const sequential = require('promise-sequential')
+const axios = require('axios')
+axios.defaults.headers.post['Content-Type'] = 'application/json'
+var createError = require('http-errors')
 var log = require('winston')
 
 /**
@@ -14,8 +14,6 @@ var log = require('winston')
 var ParserConnector = function (hostParser) {
   this.hostParser = hostParser
 }
-
-
 
 /**
 * @summary This function parses a SQL query, in order to detech which tables are affected by which actions.
@@ -41,12 +39,16 @@ ParserConnector.prototype.parseQueryIntoActionsOnTables = function (query) {
   return new Promise(function (resolve, reject) {
     axios.post(that.hostParser, {query})
       .then(response => {
-        resolve(response.data)
+        if (response) {
+          resolve(response.data)
+        } else {
+          reject(createError(500, 'reponse undefined from sql parser'))
+        }
       })
       .catch(error => {
         log.error(error)
         reject(createError(response.status, error))
-      });
+      })
   })
 }
 

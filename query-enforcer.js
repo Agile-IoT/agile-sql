@@ -1,6 +1,6 @@
 
 var util = require('./util')
-var createError = require('http-errors');
+var createError = require('http-errors')
 var log = require('winston')
 
 /**
@@ -17,7 +17,6 @@ var QueryEnforcer = function (agile, conf, mapping) {
   this.dbId = util.dbId(conf)
   this.mapping = mapping
 }
-
 
 /**
 * @summary This function receives an object with actions and tables,
@@ -41,22 +40,21 @@ var QueryEnforcer = function (agile, conf, mapping) {
 *   console.log(results);
 * });
 **/
-QueryEnforcer.prototype.evaluatePolicy = function(parseResults){
-  var that = this;
+QueryEnforcer.prototype.evaluatePolicy = function (parseResults) {
+  var that = this
   return new Promise(function (resolve, reject) {
     let query = []
-    that.checkParseResults(parseResults).then((ops) =>{
-      if(Object.keys(ops).length < 0){
+    that.checkParseResults(parseResults).then((ops) => {
+      if (Object.keys(ops).length < 0) {
         resolve()
-      }
-      else{
-        Object.keys(ops).forEach((op)=>{
+      } else {
+        Object.keys(ops).forEach((op) => {
           let listOfTables = ops[op]
-          listOfTables.forEach((name)=>{
+          listOfTables.forEach((name) => {
             query.push({
               entityId: that.dbId,
               entityType: 'database',
-              field:`actions.tables.${name}`,
+              field: `actions.tables.${name}`,
               method: op
             })
           })
@@ -64,36 +62,32 @@ QueryEnforcer.prototype.evaluatePolicy = function(parseResults){
         log.debug(`pdp query is ${JSON.stringify(query)}`)
         return that.agile.policies.pdp.evaluate(query)
       }
-    }).then((pdpRes)=>{
+    }).then((pdpRes) => {
       log.debug(`pdp query result is ${JSON.stringify(pdpRes)}`)
-      let accumulator = true;
-      pdpRes.forEach((value)=>{
+      let accumulator = true
+      pdpRes.forEach((value) => {
         accumulator = accumulator && value
       })
       log.debug(`result of merging all policies with and : ${JSON.stringify(accumulator)}`)
-      if(accumulator){
+      if (accumulator) {
         resolve()
       } else {
-        reject(createError(403, "access denied"))
+        reject(createError(403, 'access denied'))
       }
-
-    }).catch((error)=>{
-      if(error.statusCode){
+    }).catch((error) => {
+      if (error.statusCode) {
         reject(error)
-      }
-      else if(error.response && error.response.status && error.response.statusText){
+      } else if (error.response && error.response.status && error.response.statusText) {
         reject(createError(error.response.status, error.response.statusText))
-      }
-      else {
+      } else {
         log.error(`error in enforcer ${JSON.stringify(Object.keys(error))}`)
-        reject(createError(500,error))
+        reject(createError(500, error))
       }
     })
   })
 }
 
-
- /**
+/**
  * @summary This function receives an object with actions and tables,
  * as the one returned by sqlparser.parseQueryIntoActionsOnTables and resolves with
  * an Object containing the actions and the tables affected in order to use this later
@@ -119,19 +113,19 @@ QueryEnforcer.prototype.checkParseResults = function (parseResults) {
   var that = this
   return new Promise(function (resolve, reject) {
     let accumulator = {}
-    Object.keys(parseResults).forEach((currentValue)=>{
+    Object.keys(parseResults).forEach((currentValue) => {
       let done = false
-      Object.keys(that.mapping).forEach((k)=>{
-        if(that.mapping[k].indexOf(currentValue)>=0){
+      Object.keys(that.mapping).forEach((k) => {
+        if (that.mapping[k].indexOf(currentValue) >= 0) {
           done = true
-          if(parseResults[currentValue].length>0 ){
+          if (parseResults[currentValue].length > 0) {
             accumulator[k] = accumulator[k] || []
-            accumulator[k] = accumulator[k].concat(parseResults[currentValue]);
+            accumulator[k] = accumulator[k].concat(parseResults[currentValue])
           }
         }
       })
-      if(!done){
-        reject(createError(400, "unknown SQL keyword currentValue"+k))
+      if (!done) {
+        reject(createError(400, 'unknown SQL keyword currentValue' + k))
       }
     })
     log.debug(`result of accumulating actions and mapping them to read and writes : ${JSON.stringify(accumulator)}`)
