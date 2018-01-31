@@ -1,6 +1,7 @@
 var sequential = require('promise-sequential')
 var util = require('./util')
 var createError = require('http-errors')
+var log = require('winston')
 
 /**
  * Creates a new instance of a Configurator.
@@ -35,7 +36,6 @@ var Configurator = function (agile, db, conf) {
 * });
 **/
 Configurator.prototype.mapDB = function () {
-  var that = this
   let agile = this.agile
   let db = this.db
   let conf = this.conf
@@ -55,20 +55,21 @@ Configurator.prototype.mapDB = function () {
       tablesThere = true
       return Promise.resolve(entity)
     }).catch((err) => {
-      console.log(`database not registered in idm putting db with id ${id} as ${JSON.stringify(conf.db)}`)
+      log.debug(`this may be ok. It seems the database is not there ${err}`)
+      log.info(`database not registered in idm putting db with id ${id} as ${JSON.stringify(conf.db)}`)
       return agile.idm.entity.create(id, 'database', conf.db)
     }).then((entity) => {
       if (tablesThere) {
         return Promise.resolve([])
       } else {
-        console.log(`listing tables to create them in agile-security`)
+        log.info(`listing tables to create them in agile-security`)
         return db.getAllTables()
       }
     }).then((names) => {
-      if (names.length == 0) {
+      if (names.length === 0) {
         return Promise.resolve([])
       } else {
-        console.log('tables found in db are: ', JSON.stringify(names))
+        log.info('tables found in db are: ', JSON.stringify(names))
         let setting = []
         names.forEach((name) => {
           setting.push(() =>
@@ -80,11 +81,11 @@ Configurator.prototype.mapDB = function () {
             })
           )
         })
-        console.log('starting to execute the pap updates on actions.tables')
+        log.info('starting to execute the pap updates on actions.tables')
         return sequential(setting)
       }
     }).then((values) => {
-      console.log('done with the pap updates on actions.tables if they were needed')
+      log.info('done with the pap updates on actions.tables if they were needed')
       resolve()
     }).catch((error) => {
       if (error.statusCode) {

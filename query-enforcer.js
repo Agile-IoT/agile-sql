@@ -125,7 +125,7 @@ QueryEnforcer.prototype.checkParseResults = function (parseResults) {
         }
       })
       if (!done) {
-        reject(createError(400, 'unknown SQL keyword currentValue' + k))
+        reject(createError(400, `unknown SQL keyword in ${JSON.stringify(parseResults)}`))
       }
     })
     log.debug(`result of accumulating actions and mapping them to read and writes : ${JSON.stringify(accumulator)}`)

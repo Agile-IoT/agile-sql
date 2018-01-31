@@ -1,4 +1,3 @@
-const sequential = require('promise-sequential')
 const axios = require('axios')
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 var createError = require('http-errors')
@@ -47,7 +46,7 @@ ParserConnector.prototype.parseQueryIntoActionsOnTables = function (query) {
       })
       .catch(error => {
         log.error(error)
-        reject(createError(response.status, error))
+        reject(createError(error.statusCode ? error.statusCode : 500, error))
       })
   })
 }

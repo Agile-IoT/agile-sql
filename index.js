@@ -21,7 +21,11 @@ console.log(`log level ${conf.log_level || 'info'}`)
 log.level = conf.log_level || 'info'
 
 // TOKEN=2tocgbK6TXEhB1aA66CPA7eo1JCg2E9BLhyz4BaUDZFJ3TBxqQ4sdJF6oE8fq1va
+// #To execute a query without parameters do:
 // curl -XPOST -d '{"query":"select * from user"}' -H "Content-type: application/json" -H "authorization: bearer $TOKEN" localhost:3005/query
+// #To avoid SQL injections, if your application requires parameters in the query execute it like this:
+// curl -XPOST -d '{"query":"select * from user where Host = ?", "values":["localhost"]}' -H "Content-type: application/json" -H "authorization: bearer $TOKEN" localhost:3005/query
+
 app.post('/query/', bodyParser.json(), function (req, res) {
   log.debug(`result from tokenParser: ${tokenParser(req)}`)
   let token = tokenParser(req)
@@ -30,6 +34,9 @@ app.post('/query/', bodyParser.json(), function (req, res) {
     agile.tokenSet(token)
     if (req.body && req.body.hasOwnProperty('query')) {
       let query = req.body.query
+      if (req.body.hasOwnProperty('values')) {
+        query = db.escapeQuery(query, req.body.values)
+      }
       log.info(`finding out actions on tables from query : ${query}`)
       parser.parseQueryIntoActionsOnTables(query)
         .then((tablesAffected) => {

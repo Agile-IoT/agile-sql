@@ -55,10 +55,30 @@ DB.prototype.execQuery = function (query) {
       if (error) {
         reject(createError(500, error))
       } else {
-        resolve({ results})
+        resolve({results})
       }
     })
   })
+}
+
+/**
+* @summary Build final query based on a statement and a list of values. This function does not check policies, just executes SQL
+* @name escapeQuery
+* @public
+* @function
+* @memberof Mysql
+* @returns {Promise}
+* @param {String} query - SQL query
+* @param {Array} values - array with values to be replaced in the query with proper character escaping
+* @returns {String} Final Query to be executed
+* @example
+* var query = mysqlobject.escapeQuery('UPDATE users SET foo = ?, bar = ? WHERE id = ?', ['fooarg', 1 , 'useridparam'])
+* //prints UPDATE users SET foo = 'fooarg', bar = 1 WHERE id = 'useridparam'
+* console.log(query);
+**/
+
+DB.prototype.escapeQuery = function (query, values) {
+  return mysql.format(query, values)
 }
 
 /**
