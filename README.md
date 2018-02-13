@@ -53,8 +53,8 @@ By default, agile-sql maps the database it is configured to connect to with agil
 However, in order for this to work smoothly, you need to assign a valid (Oauth2) client from agile-security in the configuration.
 
 To create the client, visit the Device Manager UI and:
-  * go to the client table
-  * click on
+  * go to the client tab
+  * click on ADD NEW
   * add the name and id ``mysqlDB`` and set as clientSecret  ``Ultrasecretstuff``
   * These values are meant for demonstration purposes! to actually deploy an instance of the agile-sql service, you should update your configuration.
   * According to the docker-compose snippet shown before your configuration would be in $DATA/agile-sql/agile-db.js . Which is commonly ~/.agile/agile-sql/agile-db.js
@@ -68,7 +68,7 @@ When agile-sql starts it copies the configuration files from the repository to t
 ## Agile-sql configuration
 
 * ``db:`` details to the database where queries shall be executed (if policies are matched by the AGILE user sending the request)
-``client:`` Information about the Oauth2 agile-security client used to automatically register all the tables in the database using the default policy 
+``client:`` Information about the Oauth2 agile-security client used to automatically register all the tables in the database using the default policy
 
 * ``sdk:`` Configuration for the agile-sdk to interact with agile-security in the gateway
 
