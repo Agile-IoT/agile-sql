@@ -65,7 +65,7 @@ Whenever agile-sql starts, it tries to map all the tables from the database whic
 
 When agile-sql starts it copies the configuration files from the repository to the location mounted from the host (as shown in the docker-compose snippet above). This will connect as a root user to the mysql database (in the sql-db container).
 
-## The Sample configuration
+## Agile-sql configuration
 
 * ``db:`` details to the database where queries shall be executed (if policies are matched by the AGILE user sending the request)
 ``client:`` Information about the Oauth2 agile-security client used to automatically register all the tables in the database using the default policy 
