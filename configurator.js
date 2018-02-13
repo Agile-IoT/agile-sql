@@ -71,6 +71,15 @@ Configurator.prototype.mapDB = function () {
       } else {
         log.info('tables found in db are: ', JSON.stringify(names))
         let setting = []
+        //set top level for policies in tables
+        setting.push(() =>
+          agile.policies.pap.set({
+            entityId: id,
+            entityType: 'database',
+            field: `actions.tables`,
+            policy: conf.tablePolicy
+          })
+        )
         names.forEach((name) => {
           setting.push(() =>
             agile.policies.pap.set({
