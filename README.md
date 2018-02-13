@@ -67,11 +67,14 @@ When agile-sql starts it copies the configuration files from the repository to t
 
 ## The Sample configuration
 
-``db:`` details to the database where queries shall be executed (if policies are matched by the AGILE user sending the request)
-``client:`` Information about the Oauth2 agile-security client used to automatically register all the tables in the database using the default policy
-``sdk:`` Configuration for the agile-sdk to interact with agile-security in the gateway
-``sqlParser``: Location of the sql-parser (agile-sqlparser container) to find out which tables are affected by which kind of opperations in order to evaluate the security policies
-``tablePolicy``: Default policies used for tables when they are automatically registered (this takes effect only when the agile-sql container is started for the first time)
+* ``db:`` details to the database where queries shall be executed (if policies are matched by the AGILE user sending the request)
+``client:`` Information about the Oauth2 agile-security client used to automatically register all the tables in the database using the default policy 
+
+* ``sdk:`` Configuration for the agile-sdk to interact with agile-security in the gateway
+
+* ``sqlParser``: Location of the sql-parser (agile-sqlparser container) to find out which tables are affected by which kind of opperations in order to evaluate the security policies
+
+* ``tablePolicy``: Default policies used for tables when they are automatically registered (this takes effect only when the agile-sql container is started for the first time)
 
 
 ## Executing a Sample Query
