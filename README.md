@@ -15,7 +15,10 @@ Add the following micro-services to your docker-compose file
 
 ```
   sql-db:
-    image: mysql
+    #In a rpi use this one 
+    image: hypriot/rpi-mysql
+    #For intel use this one
+    #image: mysql
     container_name: sql-db
     restart: always
     environment:
@@ -24,7 +27,7 @@ Add the following micro-services to your docker-compose file
       - 3306:3306/tcp
 
   sql-parser:
-    image: agileiot/agile-sqlparser-$AGILE_ARCH:latest
+    image: agileiot/agile-sqlparser-$AGILE_ARCH:v0.0.1
     container_name: sql-parser
     restart: always
     depends_on:
@@ -104,3 +107,29 @@ It is possible to enable the AGILE UI to show the policies for the database obje
 For this the configuration located in $DATA/security/idm/conf/agile-ui-conf.js (ussualy located in the host at ~/.agile/security/idm/conf/agile-ui-conf.js). And update the object ``database`` inside the ``gui`` field of the configuration by changing ``hidden`` to false.
 
 Then, the policies for the particular tables will be visible in the Device Manager UI, in the tab DATABASE (the one you just made visible) and then inside the policies (under actions.tables).
+
+## Troubleshooting
+
+
+I am seeing this error in the logs:
+
+```
+agile-sql                | error:  Error: Request failed with status code 401
+agile-sql                |     at createError (/opt/app/node_modules/agile-sdk/node_modules/axios/lib/core/createError.js:15:15)
+agile-sql                |     at settle (/opt/app/node_modules/agile-sdk/node_modules/axios/lib/core/settle.js:18:12)
+agile-sql                |     at IncomingMessage.handleStreamEnd (/opt/app/node_modules/agile-sdk/node_modules/axios/lib/adapters/http.js:186:11)
+agile-sql                |     at emitNone (events.js:91:20)
+agile-sql                |     at IncomingMessage.emit (events.js:188:7)
+agile-sql                |     at endReadableNT (_stream_readable.js:975:12)
+agile-sql                |     at _combinedTickCallback (internal/process/next_tick.js:80:11)
+agile-sql                |     at process._tickCallback (internal/process/next_tick.js:104:9)
+agile-sql                | error:  TypeError: Cannot read property 'end' of undefined
+agile-sql                |     at DB.close (/opt/app/mysql.js:117:18)
+agile-sql                |     at agile.idm.authentication.authenticateClient.then.then.then.catch (/opt/app/index.js:87:13)
+agile-sql                |     at process._tickCallback (internal/process/next_tick.js:109:7)
+agile-sql                | /usr/bin/entry.sh: line 93: fg: job has terminated
+agile-sql                | checking if configuration is in folder /etc/agile-sql
+
+```
+
+This means you have not created the Oauth2 client matching the configuration file of your agile-sql instance. Without this, agile-sql cannot map your database to agile-security entities. To create it follow the steps nentioned above.

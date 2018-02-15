@@ -1,6 +1,6 @@
 module.exports = {
   db:{
-    host: 'localhost',
+    host: 'sql-db',
     user: 'root',
     password: 'root',
     database: 'mysql'
@@ -15,7 +15,7 @@ module.exports = {
     idm: 'http://agile-security:3000'
   },
   sqlParser:{
-    host:'http://localhost:8080/'
+    host:'http://sql-parser:9123/'
   },
   log_level:'info',
   tablePolicy:[
