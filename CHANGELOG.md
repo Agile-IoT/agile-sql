@@ -4,6 +4,10 @@
 
 ## v0.0.3 - 2018-01-31
 
+## v0.0.5 - 2018-02-14
+
+* Change to arv7 by default in docker file [dp]
+
 ## v0.0.4 - 2018-02-13
 
 * Create README and add top level policy for actions.tables for better visualization in the UI [dp]
