@@ -27,7 +27,7 @@ Add the following micro-services to your docker-compose file
       - 3306:3306/tcp
 
   sql-parser:
-    image: agileiot/agile-sqlparser-$AGILE_ARCH:v0.0.1
+    image: agileiot/agile-sqlparser-$AGILE_ARCH:v0.0.2
     container_name: sql-parser
     restart: always
     depends_on:
@@ -36,7 +36,7 @@ Add the following micro-services to your docker-compose file
       - 9123:9123/tcp
 
   agile-sql:
-   image: agileiot/agile-sql-$AGILE_ARCH:v0.1.0
+   image: agileiot/agile-sql-$AGILE_ARCH:v0.1.1
    container_name: agile-sql
    restart: always
    depends_on:
