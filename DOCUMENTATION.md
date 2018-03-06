@@ -1,3 +1,19 @@
+## Getting Started
+
+To use these modules, you should use agile-security version 3.7.1 or later. 
+
+It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server. 
+
+For this, log in to the database server, e.g.
+
+     mysql -u root -proot -h 127.0.0.1 -P 3306
+
+and create the database
+
+     CREATE DATABASE agile;
+
+Agile-sql will automatically use the specified database on startup, if it exists.
+
 ## Modules
 
 <dl>
