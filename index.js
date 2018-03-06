@@ -47,9 +47,28 @@ app.post('/query/', bodyParser.json(), function (req, res) {
         }).then((decisionReadWrite) => {
           return db.execQuery(query)
         }).then((results) => {
-          res.statusCode = 200
-          res.json(results)
-          log.debug(`results from query ${JSON.stringify(results, null, 2)}`)
+          if(query.includes('CREATE TABLE')) {
+            let configurator = new Configurator(agile, db, conf)
+            configurator.mapDB().then(() => {
+              res.statusCode = 200
+              res.json(results)
+              log.debug(`results from query ${JSON.stringify(results, null, 2)}`)
+            }).catch((err) => {
+              log.error(err)
+              var x = {error: 'unexpected problem ' + err}
+              if (err.statusCode) {
+                x.statusCode = err.statusCode
+              } else {
+                x.statusCode = 500
+              }
+              res.json(x)
+            })
+          } else {
+            res.statusCode = 200
+            res.json(results)
+            log.debug(`results from query ${JSON.stringify(results, null, 2)}`)
+          }
+
         }).catch((err) => {
           log.error(err)
           var x = {error: 'unexpected problem ' + err}
