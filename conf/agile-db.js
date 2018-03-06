@@ -38,5 +38,6 @@ module.exports = {
         lock: "isOwner"
       }]
     }
-  ]
+  ],
+  createIfNotExists: true
 }
