@@ -106,4 +106,56 @@ Configurator.prototype.mapDB = function () {
   })
 }
 
+Configurator.prototype.mapTable = function (tables) {
+  let agile = this.agile
+  let db = this.db
+  let conf = this.conf
+  return new Promise(function (resolve, reject) {
+    let id = util.dbId(conf)
+    agile.idm.entity.get(id, 'database').then((entity) => {
+      console.log(`db entity found ${JSON.stringify(entity)}`)
+      return Promise.resolve(entity)
+    }).catch((err) => {
+      log.debug(`this may be ok. It seems the database is not there ${err}`)
+      log.info(`database not registered in idm putting db with id ${id} as ${JSON.stringify(conf.db)}`)
+      return agile.idm.entity.create(id, 'database', conf.db)
+    }).then((entity) => {
+        log.info(`listing tables to create them in agile-security`)
+        return db.getAllTables()
+    }).then((names) => {
+      if (names.length === 0) {
+        return Promise.resolve([])
+      } else {
+        log.info('tables found in db are: ', JSON.stringify(names))
+        let setting = []
+        tables.forEach(table => {
+          if(names.includes(tables)) {
+            log.info(`Table exists - set policy for table ${tables}`)
+            setting.push(() =>
+              agile.policies.pap.set({
+                entityId: id,
+                entityType: 'database',
+                field: `actions.tables.${tables}`,
+                policy: conf.tablePolicy
+              })
+            )
+          }
+        })
+        log.info('starting to execute the pap updates on actions.tables')
+        return sequential(setting)
+      }
+    }).then((values) => {
+      log.info(`done with the pap updates on actions.tables.${tables} if they were needed`)
+      resolve()
+    }).catch((error) => {
+      if (error.statusCode) {
+        reject(error)
+      } else {
+        reject(createError(500, error))
+      }
+    })
+  })
+}
+
+
 module.exports = Configurator

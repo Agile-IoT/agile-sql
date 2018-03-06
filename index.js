@@ -11,6 +11,7 @@ var Configurator = require('./configurator')
 var db = new DB(conf.db)
 var SQLParseConnector = require('./sqlparser')
 var QueryEnforcer = require('./query-enforcer')
+var configurator = new Configurator(agile, db, conf)
 var parser = new SQLParseConnector(conf.sqlParser.host)
 var bodyParser = require('body-parser')
 var tokenParser = require('parse-bearer-token')
@@ -38,47 +39,37 @@ app.post('/query/', bodyParser.json(), function (req, res) {
         query = db.escapeQuery(query, req.body.values)
       }
       log.info(`finding out actions on tables from query : ${query}`)
+      let queriesTables
       parser.parseQueryIntoActionsOnTables(query)
         .then((tablesAffected) => {
+          queriesTables = tablesAffected
           log.info(`got the following tables affected from parsed query ${JSON.stringify(tablesAffected)}`)
           let enforcer = new QueryEnforcer(agile, conf, mapping)
           log.info(`calling the query enforcer to evaluate policy for tables affected`)
           return enforcer.evaluatePolicy(tablesAffected)
         }).then((decisionReadWrite) => {
           return db.execQuery(query)
+        }).then(results => {
+          if(queriesTables.CREATE.length > 0) {
+            log.info('Found CREATE TABLE command for table ' + queriesTables.CREATE);
+            log.info('Set policy for table ' + queriesTables.CREATE);
+            return configurator.mapTable(queriesTables.CREATE)
+          }
+          return results;
         }).then((results) => {
-          if(query.includes('CREATE TABLE')) {
-            let configurator = new Configurator(agile, db, conf)
-            configurator.mapDB().then(() => {
-              res.statusCode = 200
-              res.json(results)
-              log.debug(`results from query ${JSON.stringify(results, null, 2)}`)
-            }).catch((err) => {
-              log.error(err)
-              var x = {error: 'unexpected problem ' + err}
-              if (err.statusCode) {
-                x.statusCode = err.statusCode
-              } else {
-                x.statusCode = 500
-              }
-              res.json(x)
-            })
-          } else {
             res.statusCode = 200
             res.json(results)
             log.debug(`results from query ${JSON.stringify(results, null, 2)}`)
-          }
-
-        }).catch((err) => {
-          log.error(err)
-          var x = {error: 'unexpected problem ' + err}
-          if (err.statusCode) {
-            x.statusCode = err.statusCode
-          } else {
-            x.statusCode = 500
-          }
-          res.json(x)
-        })
+          }).catch((err) => {
+            log.error(err)
+            var x = {error: 'unexpected problem ' + err}
+            if (err.statusCode) {
+              x.statusCode = err.statusCode
+            } else {
+              x.statusCode = 500
+            }
+            res.json(x)
+          })
     } else {
       res.statusCode = 400
       log.info(`API called with a JSON body without a query attribute`)
@@ -97,7 +88,6 @@ agile.idm.authentication.authenticateClient(conf.client.id, conf.client.clientSe
   return db.init()
 }).then(() => {
   // this initializes the database in agile-security (IDM) if needed
-  let configurator = new Configurator(agile, db, conf)
   return configurator.mapDB()
 }).then(() => {
   app.listen(3005)

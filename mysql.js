@@ -118,7 +118,7 @@ DB.prototype.getAllTables = function () {
         reject(createError(500, error))
       } else {
         var res = results.map((row) => {
-          return row.Tables_in_mysql
+          return row['Tables_in_' + that.conf.database]
         })
         resolve(res)
       }
