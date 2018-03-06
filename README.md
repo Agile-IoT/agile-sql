@@ -6,7 +6,9 @@ This connector can be used to enforce read and write policies on Tables by using
 
 ## Getting Started
 
-To use these modules, you should use agile-security version 3.7.0 or later (as this is the earliest version with database entity support)
+To use these modules, you should use agile-security version 3.7.1 or later (as this is the earliest version with database entity support). 
+
+It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server. 
 
 ### Add the components to the stack
 
