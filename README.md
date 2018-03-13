@@ -6,11 +6,17 @@ This connector can be used to enforce read and write policies on Tables by using
 
 ## Getting Started
 
-To use these modules, you should use agile-security version 3.7.1 or later (as this is the earliest version with database entity support). 
+### Prerequisites
 
-It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server. 
+To use these modules, you should use agile-security version 3.7.1 or later. 
 
-### Add the components to the stack
+It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server or allow the automatic creation of databases, if they do not exist.
+
+Agile-sql will automatically use the specified database on startup.
+
+#### Option 1: Add database manually
+
+##### 1. Add the components to the stack
 
 Add the following micro-services to your docker-compose file
 
@@ -49,6 +55,101 @@ Add the following micro-services to your docker-compose file
    volumes:
     - $DATA/agile-sql/:/etc/agile-sql/    
 ```
+##### 2. Start containers
+
+     docker-compose up
+
+##### 3. Connect to database container
+
+     docker-compose exec sql-db /bin/bash
+     
+##### 4. Connect to database server
+
+     mysql -u root -p
+
+You will be prompted to enter the password. Depending on MYSQL_ROOT_PASSWORD in step 1 the password is <code>root</code>.
+ 
+##### 5. List existing databases
+
+    mysql> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    +--------------------+
+
+##### 6. Add database
+
+If in the step before the required database is not listed, add it as follows:
+
+    mysql> CREATE DATABASE agile;
+    Query OK, 1 row affected (0.00 sec)
+
+If you now list the databases again, the added database should be visible:
+
+    mysql> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | agile              |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    +--------------------+
+
+#### Option 2: Modify configuration
+To let the database being added automatically, the configuration file must be adjusted accordingly. This can be done by setting the variable <code>createIfNotExists: true</code> in the configuration file.
+Your configuration would be in your DATA path, which is commonly ~/.agile/agile-sql/agile-db.js. 
+
+The configuration file could look as follows:
+
+    module.exports = {
+      db:{
+        host: 'sql-db',
+        user: 'root',
+        port: 3306,
+        password: 'root',
+        database: 'agile'
+      },
+      client: {
+        "id": "mysqlDB",
+        "clientSecret": "Ultrasecretstuff"
+      },
+      sdk:{
+        token:'',
+        api: 'http://agile-core:8080',
+        idm: 'http://agile-security:3000'
+      },
+      sqlParser:{
+        host:'http://sql-parser:9123/'
+      },
+      log_level:'info',
+      tablePolicy:[
+        {
+          op: "write",
+          locks: [{
+            lock: "hasType",
+            args: ["/user"]
+          }, {
+            lock: "isOwner"
+          }]
+        },
+        {
+          op: "read",
+          locks: [{
+            lock: "hasType",
+            args: ["/user"]
+          }, {
+            lock: "isOwner"
+          }]
+        }
+      ],
+      createIfNotExists: true
+    }
 
 
 ## Create the client
