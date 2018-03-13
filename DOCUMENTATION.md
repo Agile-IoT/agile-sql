@@ -8,7 +8,6 @@ Agile-sql will automatically use the specified database on startup.
 
 The first option, to add the database is to log into the database server and add the database manually.
 ### 1. Add micro-services to docker-compose
-For this, add the components to the stack by adding the following to the docker-compose file:
 Add the following micro-services to your docker-compose file
 ```
   sql-db:
