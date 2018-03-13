@@ -1,10 +1,145 @@
-## Getting Started
-
+# Prerequisites
 To use these modules, you should use agile-security version 3.7.1 or later. 
 
-It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server or allow the automatic creation of databases, if they do not exist. This can be done by setting the variable <code>createIfNotExists: true</code> in the configuration file. Your configuration would be in your DATA path, which is commonly ~/.agile/agile-sql/agile-db.js 
+It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server or allow the automatic creation of databases, if they do not exist.
 
 Agile-sql will automatically use the specified database on startup.
+## Add Database manually
+
+The first option, to add the database is to log into the database server and add the database manually.
+### 1. Add micro-services to docker-compose
+For this, add the components to the stack by adding the following to the docker-compose file:
+Add the following micro-services to your docker-compose file
+```
+  sql-db:
+    #In a rpi use this one 
+    image: hypriot/rpi-mysql
+    #For intel use this one
+    #image: mysql
+    container_name: sql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306/tcp
+
+  sql-parser:
+    image: agileiot/agile-sqlparser-$AGILE_ARCH:v0.0.2
+    container_name: sql-parser
+    restart: always
+    depends_on:
+    - sql-db
+    ports:
+      - 9123:9123/tcp
+
+  agile-sql:
+   image: agileiot/agile-sql-$AGILE_ARCH:v0.1.1
+   container_name: agile-sql
+   restart: always
+   depends_on:
+    - sql-parser
+    - sql-db
+   ports:
+    - 3005:3005/tcp
+   volumes:
+    - $DATA/agile-sql/:/etc/agile-sql/    
+```
+### 2. Start containers
+
+     docker-compose up
+
+### 3. Connect to database container
+
+     docker-compose exec sql-db /bin/bash
+     
+### 4. Connect to database server
+
+     mysql -u root -p
+
+You will be prompted to enter the password. Depending on MYSQL_ROOT_PASSWORD in step 1 the password is <code>root</code>.
+ 
+### 5. List existing databases
+
+    mysql> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    +--------------------+
+
+### 6. Add database
+
+If in the step before the required database is not listed, add it as follows:
+
+    mysql> CREATE DATABASE agile;
+    Query OK, 1 row affected (0.00 sec)
+
+If you now list the databases again, the added database should be visible:
+
+    mysql> show databases;
+    +--------------------+
+    | Database           |
+    +--------------------+
+    | information_schema |
+    | agile              |
+    | mysql              |
+    | performance_schema |
+    | sys                |
+    +--------------------+
+
+## Modify configuration
+To let the database being added automatically, the configuration file must be adjusted accordingly. This can be done by setting the variable <code>createIfNotExists: true</code> in the configuration file.
+Your configuration would be in your DATA path, which is commonly ~/.agile/agile-sql/agile-db.js. 
+
+The configuration file could look as follows:
+
+    module.exports = {
+      db:{
+        host: 'sql-db',
+        user: 'root',
+        port: 3306,
+        password: 'root',
+        database: 'agile'
+      },
+      client: {
+        "id": "mysqlDB",
+        "clientSecret": "Ultrasecretstuff"
+      },
+      sdk:{
+        token:'',
+        api: 'http://agile-core:8080',
+        idm: 'http://agile-security:3000'
+      },
+      sqlParser:{
+        host:'http://sql-parser:9123/'
+      },
+      log_level:'info',
+      tablePolicy:[
+        {
+          op: "write",
+          locks: [{
+            lock: "hasType",
+            args: ["/user"]
+          }, {
+            lock: "isOwner"
+          }]
+        },
+        {
+          op: "read",
+          locks: [{
+            lock: "hasType",
+            args: ["/user"]
+          }, {
+            lock: "isOwner"
+          }]
+        }
+      ],
+      createIfNotExists: true
+    }
+
 
 ## Modules
 
