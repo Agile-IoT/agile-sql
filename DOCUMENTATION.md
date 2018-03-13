@@ -2,17 +2,9 @@
 
 To use these modules, you should use agile-security version 3.7.1 or later. 
 
-It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server. 
+It needs to be made sure that the database defined in the configuration file (e.g. <code>database: 'agile'</code>) already exists on the database server or allow the automatic creation of databases, if they do not exist. This can be done by setting the variable <code>createIfNotExists: true</code> in the configuration file. Your configuration would be in your DATA path, which is commonly ~/.agile/agile-sql/agile-db.js 
 
-For this, log in to the database server, e.g.
-
-     mysql -u root -proot -h 127.0.0.1 -P 3306
-
-and create the database
-
-     CREATE DATABASE agile;
-
-Agile-sql will automatically use the specified database on startup, if it exists.
+Agile-sql will automatically use the specified database on startup.
 
 ## Modules
 
@@ -54,6 +46,7 @@ This function builds a unique id based on the host and database name
 * [Configurator](#Configurator)
     * [new Configurator(agile, db, conf)](#new_Configurator_new)
     * [.mapDB()](#Configurator.mapDB) ⇒ <code>Promise</code>
+    * [.mapTable(tables)](#Configurator.mapTable) ⇒ <code>Promise</code>
 
 <a name="new_Configurator_new"></a>
 
@@ -83,6 +76,24 @@ configurator.mapDB().then(function() {
   console.log();
 });
 ```
+### Configurator.mapTable(tables) ⇒ <code>Promise</code>
+**Kind**: static method of [<code>Configurator</code>](#Configurator)  
+**Summary**: This function queries the sql database and registers all the tables passed as the parameter with the default policies.
+The default policy comes from the configuration object provided during creation  
+**Access**: public  
+**Fulfil**: <code>void</code> resolves without an argument 
+
+| Param | Type | Description |
+| --- | --- | --- |
+| query | <code>Array</code> | table names |
+ 
+**Example**  
+```js
+configurator.mapTable(tables).then(function() {
+  console.log();
+});
+```
+
 <a name="Mysql"></a>
 
 ## Mysql
