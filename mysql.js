@@ -32,6 +32,12 @@ DB.prototype.init = function () {
       that.connection = mysql.createConnection(dbConf)
       that.connection.connect()
       that.execQuery('USE ' + that.conf.database).then(data => {
+        return that.getAllTables().catch(err => {
+          reject(createError(500, 'Something went wrong when accessing an existing database.\n' +
+            'Are you using CryptDB and trying to access a database that were not created with the current CryptDB instance?\n' +
+            'Consider changing the database name to create a new database for this instance.'))
+        })
+      }).then(data => {
         resolve();
       }).catch(err => {
         if(createIfNotExists && err.sqlMessage.includes('Unknown database')) {
