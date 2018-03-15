@@ -67,7 +67,12 @@ Configurator.prototype.mapDB = function () {
       }
     }).then((names) => {
       if (names.length === 0) {
-        return Promise.resolve([])
+        return agile.policies.pap.set({
+          entityId: id,
+          entityType: 'database',
+          field: `actions.tables`,
+          policy: conf.tablePolicy
+        })
       } else {
         log.info('tables found in db are: ', JSON.stringify(names))
         let setting = []
