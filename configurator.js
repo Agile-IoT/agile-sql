@@ -129,13 +129,13 @@ Configurator.prototype.mapTable = function (tables) {
         log.info('tables found in db are: ', JSON.stringify(names))
         let setting = []
         tables.forEach(table => {
-          if(names.includes(tables)) {
-            log.info(`Table exists - set policy for table ${tables}`)
+          if(names.includes(table)) {
+            log.info(`Table exists - set policy for table ${table}`)
             setting.push(() =>
               agile.policies.pap.set({
                 entityId: id,
                 entityType: 'database',
-                field: `actions.tables.${tables}`,
+                field: `actions.tables.${table}`,
                 policy: conf.tablePolicy
               })
             )
