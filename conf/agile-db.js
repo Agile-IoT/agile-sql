@@ -2,8 +2,9 @@ module.exports = {
   db:{
     host: 'sql-db',
     user: 'root',
+    port: 3306,
     password: 'root',
-    database: 'mysql'
+    database: 'agile'
   },
   client: {
     "id": "mysqlDB",
@@ -37,5 +38,6 @@ module.exports = {
         lock: "isOwner"
       }]
     }
-  ]
+  ],
+  createIfNotExists: true
 }

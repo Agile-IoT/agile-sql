@@ -1,6 +1,6 @@
 var mysql = require('mysql')
 var createError = require('http-errors')
-
+var createIfNotExists = require('./conf/agile-db').createIfNotExists;
 /**
  * Creates a new Mysql connection.
  * @constructor Mysql
@@ -23,10 +23,36 @@ DB.prototype.init = function () {
   var that = this
   return new Promise(function (resolve, reject) {
     if (!that.connection) {
-      that.connection = mysql.createConnection(that.conf)
+      var dbConf = {}
+      for(var key in that.conf) {
+        if(that.conf.hasOwnProperty(key) && key !== 'database') {
+          dbConf[key] = that.conf[key]
+        }
+      }
+      that.connection = mysql.createConnection(dbConf)
       that.connection.connect()
+      that.execQuery('USE ' + that.conf.database).then(data => {
+        return that.getAllTables().catch(err => {
+          reject(createError(500, 'Something went wrong when accessing an existing database.\n' +
+            'Are you using CryptDB and trying to access a database that were not created with the current CryptDB instance?\n' +
+            'Consider changing the database name to create a new database for this instance.'))
+        })
+      }).then(data => {
+        resolve();
+      }).catch(err => {
+        if(createIfNotExists && err.sqlMessage.includes('Unknown database')) {
+          that.execQuery('CREATE DATABASE ' + that.conf.database).then(data => {
+            that.execQuery('USE ' + that.conf.database)
+            console.log('Successfully created database', that.conf.database)
+            resolve();
+          }).catch(err => {
+            reject(createError(500, err))
+          })
+        }
+      })
+    } else {
+      resolve()
     }
-    resolve()
   })
 }
 
@@ -98,7 +124,7 @@ DB.prototype.getAllTables = function () {
         reject(createError(500, error))
       } else {
         var res = results.map((row) => {
-          return row.Tables_in_mysql
+          return row['Tables_in_' + that.conf.database]
         })
         resolve(res)
       }

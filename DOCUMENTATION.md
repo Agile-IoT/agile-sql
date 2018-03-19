@@ -38,6 +38,7 @@ This function builds a unique id based on the host and database name
 * [Configurator](#Configurator)
     * [new Configurator(agile, db, conf)](#new_Configurator_new)
     * [.mapDB()](#Configurator.mapDB) ⇒ <code>Promise</code>
+    * [.mapTable(tables)](#Configurator.mapTable) ⇒ <code>Promise</code>
 
 <a name="new_Configurator_new"></a>
 
@@ -67,6 +68,24 @@ configurator.mapDB().then(function() {
   console.log();
 });
 ```
+### Configurator.mapTable(tables) ⇒ <code>Promise</code>
+**Kind**: static method of [<code>Configurator</code>](#Configurator)  
+**Summary**: This function queries the sql database and registers all the tables passed as the parameter with the default policies.
+The default policy comes from the configuration object provided during creation  
+**Access**: public  
+**Fulfil**: <code>void</code> resolves without an argument 
+
+| Param | Type | Description |
+| --- | --- | --- |
+| query | <code>Array</code> | table names |
+ 
+**Example**  
+```js
+configurator.mapTable(tables).then(function() {
+  console.log();
+});
+```
+
 <a name="Mysql"></a>
 
 ## Mysql
