@@ -14,7 +14,13 @@ It needs to be made sure that the database defined in the configuration file (e.
 
 Agile-sql will automatically use the specified database on startup.
 
-#### Option 1: Add database manually
+#### Choose a database
+
+It is possible to use different kinds of backend databases to store the data through the AGILE SQL connector. In the following documentation a plain MySQL database is used (```sql-db``` section in the compose configuration). 
+
+However, we also tested the AGILE SQL connector with CryptDB, which encrypts the stored data. Instructions, how to setup a CryptDB database can be found in [Practical-Cryptdb_Docker](https://github.com/Agile-IoT/Practical-Cryptdb_Docker) and [agile-cryptdb-backend](https://github.com/Agile-IoT/agile-cryptdb-backend).  
+
+#### Option 1: Add the database manually
 
 ##### 1. Add the components to the stack
 
