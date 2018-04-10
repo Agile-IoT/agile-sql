@@ -4,6 +4,10 @@
 
 ## v0.0.3 - 2018-01-31
 
+## v0.2.0 - 2018-04-10
+
+* Update configuration parts [dp]
+
 ## v0.1.1 - 2018-02-15
 
 * Update docker fild to use maven instead of java. This didn't work on the pi although it runs in an intel machine... [dp]
