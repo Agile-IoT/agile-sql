@@ -40,7 +40,7 @@ DB.prototype.init = function () {
       }).then(data => {
         resolve();
       }).catch(err => {
-        if(createIfNotExists && err.sqlMessage.includes('Unknown database')) {
+        if(createIfNotExists && err.sqlMessage && err.sqlMessage.includes('Unknown database')) {
           that.execQuery('CREATE DATABASE ' + that.conf.database).then(data => {
             that.execQuery('USE ' + that.conf.database)
             console.log('Successfully created database', that.conf.database)
@@ -48,7 +48,9 @@ DB.prototype.init = function () {
           }).catch(err => {
             reject(createError(500, err))
           })
-        }
+        } else {
+  	  reject(createError(500, "Database not available"))
+	}
       })
     } else {
       resolve()
